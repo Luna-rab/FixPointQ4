@@ -13,6 +13,7 @@ import java.util.Map;
 public class WatchLog {
     public static void main(String[] args){
         Path input = Paths.get(args[0]);
+        int N = Integer.parseInt(args[1]);
         try {
             List<String> lines = Files.readAllLines(input);
             Map<String,Server> servers = new HashMap<String,Server>();
@@ -22,7 +23,7 @@ public class WatchLog {
                 if(servers.containsKey(key)){
                     servers.get(key).add_log(log);
                 }else{
-                    servers.put(key, new Server(log.get_address2(), log.get_prefix()));
+                    servers.put(key, new Server(log.get_address2(), log.get_prefix(), N));
                     servers.get(key).add_log(log);
                 }
             }
