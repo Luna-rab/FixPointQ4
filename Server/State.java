@@ -3,7 +3,7 @@ package Server;
 public class State {
     private String start;
     private String end;
-    private int status; //0:正常 1:故障
+    private int status; //0:normal 1:Failure
 
     public State(String start){
         this.start = start;
