@@ -3,19 +3,21 @@ package Server;
 public class State {
     private String start;
     private String end;
-    private int status; //0:normal 1:Failure 2:Failure?
+    private int status; //0:normal 1:Failure 2:Failure? 3:Overload
     private int no_reply;
+    private int reply;
 
     public State(String start, int status){
         this.start = start;
         this.status = status;
         this.no_reply = 0;
+        this.reply = 0;
     }
 
-    public State(String start, int status, int noreply){
+    public State(String start, int status, int reply){
         this.start = start;
         this.status = status;
-        this.no_reply = noreply;
+        this.reply = reply;
     }
 
     public String get_start(){
@@ -34,6 +36,10 @@ public class State {
         return this.no_reply;
     }
 
+    public int get_reply(){
+        return this.reply;
+    }
+
     public void set_end(String end){
         this.end = end;
     }
@@ -46,8 +52,16 @@ public class State {
         this.no_reply++;
     }
 
+    public void inc_reply(){
+        this.reply++;
+    }
+
     public void reset_noreply(){
         this.no_reply = 0;
+    }
+
+    public void reset_reply(){
+        this.reply = 0;
     }
     
 }

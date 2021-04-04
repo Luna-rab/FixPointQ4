@@ -10,13 +10,17 @@ public class Server {
     private List<State> states = new ArrayList<State>();
     private State state = null;
     private int N;
+    private int m;
+    private int t;
 
     private Log l = new Log();
 
-    public Server(long address, int prefix, int N){
+    public Server(long address, int prefix, int N, int m, int t){
         this.address = address;
         this.prefix = prefix;
         this.N = N;
+        this.m = m;
+        this.t = t;
         this.state = null;
     }
 
@@ -33,8 +37,8 @@ public class Server {
     }
 
     public void add_log(Log log){
-        state_controll(log);
         logs.add(log);
+        state_controll(log);
     }
 
     void state_controll(Log log){
@@ -47,6 +51,18 @@ public class Server {
                 }else{
                     this.state.set_status(2);
                 }
+            }else{
+                this.state.inc_reply();
+                if(this.state.get_reply()>=m){
+                    int avetime = 0;
+                    for(int i=0; i<m; i++){
+                        avetime += this.logs.get(this.logs.size()-1-i).get_ping();
+                    }
+                    avetime /= m;
+                    if(avetime >= this.t){
+                        this.state = new State(log.get_date(),3);
+                    }
+                }
             }
 
         }else{
@@ -55,12 +71,24 @@ public class Server {
                     if(log.get_ping() < 0){
                         this.state.inc_noreply();
                         if(this.state.get_noreply() >= N){
-                            this.state = new State(log.get_date(),1,this.state.get_noreply());
+                            this.state = new State(log.get_date(),1);
+                            this.state.inc_noreply();
                         }else{
-                            this.state = new State(log.get_date(),2,this.state.get_noreply());
+                            this.state = new State(log.get_date(),2);
+                            this.state.inc_noreply();
                         }
                     }else{
-                        this.state.reset_noreply();
+                        this.state.inc_reply();
+                        if(this.state.get_reply()>=m){
+                            int avetime = 0;
+                            for(int i=0; i<m; i++){
+                                avetime += this.logs.get(this.logs.size()-1-i).get_ping();
+                            }
+                            avetime /= m;
+                            if(avetime >= this.t){
+                                this.state = new State(log.get_date(),3,this.state.get_reply());
+                            }
+                        }
                     }
                     break;
                 case 1:
@@ -70,6 +98,7 @@ public class Server {
                         this.state.set_end(log.get_date());
                         this.states.add(this.state);
                         this.state = new State(log.get_date(),0);
+                        this.state.inc_reply();
                     }
                     break;
                 case 2:
@@ -79,9 +108,39 @@ public class Server {
                             this.state.set_status(1);
                         }
                     }else{
-                        this.state.reset_noreply();
-                        this.state.set_status(0);
+                        this.state = new State(log.get_date(),0);
+                        this.state.inc_reply();
                     }
+                case 3:
+                if(log.get_ping() < 0){
+                    this.state.inc_noreply();
+                    if(this.state.get_noreply() >= N){
+                        this.state.set_end(log.get_date());
+                        this.states.add(this.state);
+                        this.state = new State(log.get_date(),1);
+                        this.state.inc_noreply();
+                    }else{
+                        this.state.set_end(log.get_date());
+                        this.states.add(this.state);
+                        this.state = new State(log.get_date(),2);
+                        this.state.inc_noreply();
+                    }
+                }else{
+                    this.state.inc_reply();
+                    if(this.state.get_reply()>=m){
+                        int avetime = 0;
+                        for(int i=0; i<m; i++){
+                            avetime += this.logs.get(this.logs.size()-1-i).get_ping();
+                        }
+                        avetime /= m;
+                        if(avetime < this.t){
+                            this.state.set_end(log.get_date());
+                            this.states.add(this.state);
+                            this.state = new State(log.get_date(),0,this.state.get_reply());
+                        }
+                    }
+                }
+                break;
             }
         }
     }
