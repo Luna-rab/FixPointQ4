@@ -4,17 +4,17 @@ import java.util.ArrayList;
 import Log.Log;
 
 public class Server {
-    private long address;
-    private int prefix; 
-    private List<Log> logs = new ArrayList<Log>();
-    private List<State> states = new ArrayList<State>();
-    private State state = null;
-    private int N;
-    private int m;
-    private int t;
+    long address;
+    int prefix; 
+    List<Log> logs = new ArrayList<Log>();
+    List<State> states = new ArrayList<State>();
+    State state = null;
+    int N;
+    int m;
+    int t;
 
-    private Log l = new Log();
-
+    Log l = new Log();
+    public Server(){}
     public Server(long address, int prefix, int N, int m, int t){
         this.address = address;
         this.prefix = prefix;
@@ -34,6 +34,10 @@ public class Server {
 
     public int get_prefix(){
         return this.prefix;
+    }
+
+    public long get_subnet(){
+        return l.get_subnet(this.address, this.prefix);
     }
 
     public void add_log(Log log){

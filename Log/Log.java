@@ -58,4 +58,20 @@ public class Log {
     public int get_prefix(){
         return this.prefix;
     }
+
+    public long get_subnet(long address, int prefix){
+        long mask = 0;
+        for(int i=0; i<prefix; i++){
+            mask += (long)Math.pow(2, 31-i);
+        }
+        return address & mask;
+    }
+
+    public long get_subnet(){
+        long mask = 0;
+        for(int i=0; i<this.prefix; i++){
+            mask += (long)Math.pow(2, 31-i);
+        }
+        return this.address & mask;
+    }
 }
